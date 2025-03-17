@@ -24,18 +24,16 @@ export async function scrapeTenders() {
         const rows = Array.from(
           document.querySelectorAll("table.display.dataTable tbody tr")
         );
-        return rows.map((row) => {
-          return {
-            category:
-              row.querySelector("td:nth-child(2)")?.textContent?.trim() || "",
-            description:
-              row.querySelector("td:nth-child(3)")?.textContent?.trim() || "",
-            advertised:
-              row.querySelector("td:nth-child(5)")?.textContent?.trim() || "",
-            closing:
-              row.querySelector("td:nth-child(6")?.textContent?.trim() || "",
-          };
-        });
+        return rows.map((row) => ({
+          category:
+            row.querySelector("td:nth-child(2)")?.textContent?.trim() || "",
+          description:
+            row.querySelector("td:nth-child(3)")?.textContent?.trim() || "",
+          advertised:
+            row.querySelector("td:nth-child(5)")?.textContent?.trim() || "",
+          closing:
+            row.querySelector("td:nth-child(6")?.textContent?.trim() || "",
+        }));
       });
 
       allTenders.push(...tenders); // Add the current page's tenders to the allTenders array

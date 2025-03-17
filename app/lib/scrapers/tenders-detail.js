@@ -26,20 +26,18 @@ export async function scrapeTendersDetail() {
         const rows = Array.from(
           document.querySelectorAll("table.display.dataTable tbody tr")
         );
-        return rows.map((row) => {
-          return {
-            button:
-              row.querySelector("td:nth-child(1)")?.textContent?.trim() || "",
-            category:
-              row.querySelector("td:nth-child(2)")?.textContent?.trim() || "",
-            description:
-              row.querySelector("td:nth-child(3)")?.textContent?.trim() || "",
-            advertised:
-              row.querySelector("td:nth-child(5)")?.textContent?.trim() || "",
-            closing:
-              row.querySelector("td:nth-child(6)")?.textContent?.trim() || "",
-          };
-        });
+        return rows.map((row) => ({
+          button:
+            row.querySelector("td:nth-child(1)")?.textContent?.trim() || "",
+          category:
+            row.querySelector("td:nth-child(2)")?.textContent?.trim() || "",
+          description:
+            row.querySelector("td:nth-child(3)")?.textContent?.trim() || "",
+          advertised:
+            row.querySelector("td:nth-child(5)")?.textContent?.trim() || "",
+          closing:
+            row.querySelector("td:nth-child(6)")?.textContent?.trim() || "",
+        }));
       });
 
       // Click on each row to reveal details
