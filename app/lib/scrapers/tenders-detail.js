@@ -17,7 +17,7 @@ export async function scrapeTendersDetail() {
     const allTenders = [];
     let hasNextPage = true;
 
-    while (hasNextPage && allTenders.length <= 1) {
+    while (hasNextPage && allTenders.length <= 5) {
       // Wait for the table to load
       await page.waitForSelector("table.display.dataTable");
 
@@ -43,7 +43,10 @@ export async function scrapeTendersDetail() {
       });
 
       // Click on each row to reveal details
+      let clickCount = 0;
       for (const row of tenders) {
+        if (clickCount >= 2) break; // Stop after clicking on two rows
+
         const rows = await page.evaluate(() => {
           return Array.from(
             document.querySelectorAll("table.display.dataTable tbody tr")
@@ -66,6 +69,7 @@ export async function scrapeTendersDetail() {
                 [index].querySelector("td:nth-child(1)");
               buttonCell?.click();
             }, index);
+
             console.log(`Clicked row: ${row.description}`);
             await page.waitForFunction(
               (index) => {
@@ -75,10 +79,9 @@ export async function scrapeTendersDetail() {
                 return row.classList.contains("shown");
               },
               { timeout: 30000 },
-              index // Pass index to evaluate function
+              index
             );
 
-            // Now get the next row (expanded details row)
             const details = await page.evaluate((index) => {
               const detailRow = document.querySelectorAll(
                 "table.display.dataTable tbody tr"
@@ -93,6 +96,7 @@ export async function scrapeTendersDetail() {
             }, index);
 
             row.details = details;
+            clickCount++; // Increment the counter
             break; // Exit the inner loop once clicked
           }
         }
@@ -104,7 +108,6 @@ export async function scrapeTendersDetail() {
       const nextButton = await page.$("a.paginate_button"); // Adjust the selector based on the actual pagination button
       if (nextButton) {
         await nextButton.click(); // Click the "Next" button
-        await page.waitForTimeout(1000); // Wait for 1 second to allow the next page to load
       } else {
         hasNextPage = false; // No more pages
       }
