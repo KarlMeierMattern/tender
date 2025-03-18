@@ -13,17 +13,16 @@ export async function scrapeTendersTest() {
       waitUntil: "networkidle0",
     });
 
-    const allElements = await page.evaluate(() => {
-      const elements = Array.from(document.body.getElementsByTagName("*"));
-      return elements.map((element) => ({
-        tagName: element.tagName,
-        textContent: element.textContent.trim(),
-        classList: Array.from(element.classList),
-        id: element.id,
-      }));
+    const descriptions = await page.evaluate(() => {
+      return Array.from(
+        document.querySelectorAll("table.display.dataTable tbody tr")
+      ).map((row) => {
+        return row.querySelector("td.sorting_1")?.textContent.trim();
+      });
     });
+    console.log(descriptions);
 
-    return allElements;
+    return descriptions;
   } catch (error) {
     console.log("Scraping error", error);
     throw error;
