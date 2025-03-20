@@ -75,3 +75,30 @@ export async function getAiResponse() {
     );
   }
 }
+
+export async function getCategorizedTenders() {
+  try {
+    const tenders = await scrapeTenders();
+    const categorizedTenders = {};
+
+    tenders.forEach((tender) => {
+      const category = tender.category;
+      if (!categorizedTenders[category]) {
+        categorizedTenders[category] = [];
+      } else {
+        categorizedTenders[category].push({
+          description: tender.description,
+          advertised: tender.advertised,
+          closing: tender.closing,
+        });
+      }
+    });
+
+    return NextResponse.json({ success: true, data: categorizedTenders });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: StatusCodes.INTERNAL_SERVER_ERROR }
+    );
+  }
+}

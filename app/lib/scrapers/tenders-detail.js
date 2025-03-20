@@ -3,7 +3,7 @@ import { ETENDERS_URL } from "@/app/lib/utils/constants";
 
 export async function scrapeTendersDetail() {
   const browser = await puppeteer.launch({
-    headless: false, // Disable headless mode
+    headless: false,
     slowMo: 100,
   });
 
