@@ -109,6 +109,15 @@ export async function scrapeTendersDetail() {
               }
             });
 
+            // Rename the specific key
+            if (tenderDetails["placewheregoods,worksorservicesarerequired"]) {
+              tenderDetails["placeServicesRequired"] =
+                tenderDetails["placewheregoods,worksorservicesarerequired"];
+              delete tenderDetails[
+                "placewheregoods,worksorservicesarerequired"
+              ]; // Remove the old key
+            }
+
             // Merge the details into the tender object
             const tender = {
               category: row.category,
@@ -128,20 +137,14 @@ export async function scrapeTendersDetail() {
               "contactperson",
               "email",
               "telephonenumber",
+              "specialconditions",
+              "datepublished",
+              "closingdate",
             ];
 
             keysToRemove.forEach((key) => {
               delete tender[key]; // Remove the key from the tender object
             });
-
-            // Rename the specific key
-            if (tenderDetails["placewheregoods,worksorservicesarerequired"]) {
-              tenderDetails["placeServicesRequired"] =
-                tenderDetails["placewheregoods,worksorservicesarerequired"];
-              delete tenderDetails[
-                "placewheregoods,worksorservicesarerequired"
-              ]; // Remove the old key
-            }
 
             // Add the tender to the allTenders array
             allTenders.push(tender);
