@@ -17,7 +17,7 @@ export async function scrapeTendersDetail() {
     const allTenders = [];
     let hasNextPage = true;
 
-    while (hasNextPage && allTenders.length < 20) {
+    while (hasNextPage && allTenders.length < 10) {
       // specifies the number of entries to scrape
       // Wait for the table to load
       await page.waitForSelector("table.display.dataTable");
@@ -43,7 +43,7 @@ export async function scrapeTendersDetail() {
       let clickCount = 0;
       // iterates over each object in the tenders array
       for (const row of tenders) {
-        if (clickCount >= 10) break; // specifies the number of detailed entries to scrape
+        if (clickCount >= 5) break; // specifies the number of detailed entries to scrape
 
         const rows = await page.evaluate(() => {
           return Array.from(
@@ -51,7 +51,8 @@ export async function scrapeTendersDetail() {
           ).map((tr) => tr.innerHTML); // maps over each row (tr) in the array and retrieves the innerHTML of each row
         });
 
-        // .entries extracts key, value pairs
+        // .entries extracts key, value pairs i.e. you get both the index of the row and the HTML content of that row.
+        // The index variable is used to access the specific row in the DOM that corresponds to the current iteration of the loop.
         for (const [index, rowHTML] of rows.entries()) {
           const description = await page.evaluate((index) => {
             const row = document.querySelectorAll(
@@ -100,7 +101,10 @@ export async function scrapeTendersDetail() {
               const [key, value] = detail; // Assuming each detail is an array of [key, value]
               if (key && value) {
                 // Convert keys to camelCase or any desired format
-                const formattedKey = key.replace(/\s+/g, "").toLowerCase(); // Example: "Tender Number" -> "tenderNumber"
+                const formattedKey = key
+                  .replace(/:\s*$/, "")
+                  .replace(/\s+/g, "")
+                  .toLowerCase(); // Example: "Tender Number:" -> "tendernumber"
                 tenderDetails[formattedKey] = value;
               }
             });
@@ -116,20 +120,31 @@ export async function scrapeTendersDetail() {
 
             // Remove unwanted keys
             const keysToRemove = [
-              "faxnumber:",
-              "isthereabriefingsession?:",
+              "faxnumber",
+              "isthereabriefingsession?",
               "isitcompulsory?",
-              "briefingdateandtime:",
-              "briefingvenue:",
+              "briefingdateandtime",
+              "briefingvenue",
+              "contactperson",
+              "email",
+              "telephonenumber",
             ];
 
             keysToRemove.forEach((key) => {
               delete tender[key]; // Remove the key from the tender object
             });
 
+            // Rename the specific key
+            if (tenderDetails["placewheregoods,worksorservicesarerequired"]) {
+              tenderDetails["placeServicesRequired"] =
+                tenderDetails["placewheregoods,worksorservicesarerequired"];
+              delete tenderDetails[
+                "placewheregoods,worksorservicesarerequired"
+              ]; // Remove the old key
+            }
+
             // Add the tender to the allTenders array
             allTenders.push(tender);
-            // row.details = details;
             clickCount++; // Increment the counter
             break; // Exit the inner loop once clicked
           }
