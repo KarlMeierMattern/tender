@@ -14,7 +14,7 @@ export async function updateTenders() {
     console.log("Connected to MongoDB");
 
     // 1. Get new data from scraping
-    const scrapedTenders = await scrapeTendersDetail({ maxPages: Infinity });
+    const scrapedTenders = await scrapeTendersDetail({ maxPages: 1 });
 
     // 2. Format the scraped tenders
     const formattedTenders = scrapedTenders.map((tender) => {
@@ -104,7 +104,14 @@ export async function updateTenders() {
 
 // Only run directly if this file is executed directly (not imported)
 if (import.meta.url === new URL(import.meta.url).href) {
-  console.log("Starting tender database update:", new Date().toISOString());
+  console.log(
+    "Starting tender database update:",
+    new Date().toLocaleString("en-ZA", {
+      timeZone: "Africa/Johannesburg",
+      dateStyle: "full",
+      timeStyle: "long",
+    })
+  );
   updateTenders().catch((error) => {
     console.error("Update failed:", error);
     process.exit(1);
