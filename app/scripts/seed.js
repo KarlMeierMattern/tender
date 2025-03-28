@@ -3,14 +3,14 @@
 // npm run db:seed
 
 import mongoose from "mongoose";
-import { TenderModel } from "@/app/model/tenderModel.js";
-import { scrapeTendersDetail } from "@/app/lib/scrapers/tenders-detail.js";
+import { TenderModel } from "../model/tenderModel.js";
+import { scrapeTendersDetail } from "../lib/scrapers/tenders-detail.js";
 import dotenv from "dotenv";
 dotenv.config();
 
 async function connectDB() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
@@ -27,20 +27,27 @@ async function main() {
     console.log("Cleared existing tenders");
 
     // Scrape tender data
-    const tenders = await scrapeTendersDetail();
+    const tenders = await scrapeTendersDetail({ maxPages: Infinity });
+    console.log("Starting full data scrape...");
 
     // Format the data to match your schema
-    const formattedTenders = tenders.map((tender) => ({
-      category: tender.category,
-      description: tender.description,
-      advertised: new Date(tender.advertised), // Convert to Date since your schema expects a Date type
-      closing: tender.closing,
-      tendernumber: tender.tendernumber,
-      department: tender.department,
-      tendertype: tender.tendertype,
-      province: tender.province,
-      placeServicesRequired: tender.placeServicesRequired,
-    }));
+    const formattedTenders = tenders.map((tender) => {
+      // Convert DD/MM/YYYY to mongo db recognised format of YYYY-MM-DD
+      const [day, month, year] = tender.advertised.split("/");
+      const formattedDate = `${year}-${month}-${day}`;
+
+      return {
+        category: tender.category,
+        description: tender.description,
+        advertised: new Date(formattedDate), // Convert to Date object
+        closing: tender.closing,
+        tendernumber: tender.tendernumber,
+        department: tender.department,
+        tendertype: tender.tendertype,
+        province: tender.province,
+        placeServicesRequired: tender.placeServicesRequired,
+      };
+    });
 
     // Insert the tenders
     const result = await TenderModel.insertMany(formattedTenders);

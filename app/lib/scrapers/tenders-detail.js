@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { ETENDERS_URL } from "@/app/lib/utils/constants";
+import { ETENDERS_URL } from "../utils/constants.js";
 
 export async function scrapeTendersDetail(options = {}) {
   // Default to 1 page (10 entries) if not specified

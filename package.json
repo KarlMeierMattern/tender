@@ -2,11 +2,12 @@
   "name": "tender",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "db:seed": "node scripts/seed.js"
+    "db:seed": "node app/scripts/seed.js"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.2.7",
