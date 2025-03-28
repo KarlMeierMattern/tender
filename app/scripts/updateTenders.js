@@ -1,34 +1,39 @@
-// Handles periodic updates to the db
+// performs a single database update when manually executed
 // npm run db:update
 
 import mongoose from "mongoose";
-import { TenderModel } from "@/app/model/tenderModel.js";
-import { scrapeTendersDetail } from "@/app/lib/scrapers/tenders-detail.js";
-import { config } from "dotenv";
+import { TenderModel } from "../model/tenderModel.js";
+import { scrapeTendersDetail } from "../lib/scrapers/tenders-detail.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-config();
-
-async function updateTenders() {
+export async function updateTenders() {
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB");
 
     // 1. Get new data from scraping
-    const scrapedTenders = await scrapeTendersDetail();
+    const scrapedTenders = await scrapeTendersDetail({ maxPages: Infinity });
 
     // 2. Format the scraped tenders
-    const formattedTenders = scrapedTenders.map((tender) => ({
-      category: tender.category,
-      description: tender.description,
-      advertised: new Date(tender.advertised),
-      closing: tender.closing,
-      tendernumber: tender.tendernumber,
-      department: tender.department,
-      tendertype: tender.tendertype,
-      province: tender.province,
-      placeServicesRequired: tender.placeServicesRequired,
-    }));
+    const formattedTenders = scrapedTenders.map((tender) => {
+      // Convert DD/MM/YYYY to mongo db recognised format of YYYY-MM-DD
+      const [day, month, year] = tender.advertised.split("/");
+      const formattedDate = `${year}-${month}-${day}`;
+
+      return {
+        category: tender.category,
+        description: tender.description,
+        advertised: new Date(formattedDate), // Convert to Date object
+        closing: tender.closing,
+        tendernumber: tender.tendernumber,
+        department: tender.department,
+        tendertype: tender.tendertype,
+        province: tender.province,
+        placeServicesRequired: tender.placeServicesRequired,
+      };
+    });
 
     // 3. Get all existing tender numbers from DB
     const existingTenders = await TenderModel.find({}, "tendernumber");
@@ -42,13 +47,15 @@ async function updateTenders() {
     const scrapedTenderNumbers = new Set();
 
     formattedTenders.forEach((tender) => {
+      // Add each scraped tender number to a Set of all scraped numbers
       scrapedTenderNumbers.add(tender.tendernumber);
 
+      // Check if this tender number already exists in our database
       if (!existingTenderNumbers.has(tender.tendernumber)) {
-        // This is a new tender
+        // If it doesn't exist in database, it's a new tender
         newTenders.push(tender);
       } else {
-        // This tender exists and might need updating
+        // If it does exist, we might need to update it
         updatedTenders.push(tender);
       }
     });
@@ -78,6 +85,7 @@ async function updateTenders() {
 
     // Remove old tenders
     if (tendersToRemove.length > 0) {
+      // delete any document where the tendernumber is in our tendersToRemove array
       await TenderModel.deleteMany({
         tendernumber: { $in: tendersToRemove },
       });
@@ -94,9 +102,11 @@ async function updateTenders() {
   }
 }
 
-// Add logging for when the update runs
-console.log("Starting tender database update:", new Date().toISOString());
-updateTenders().catch((error) => {
-  console.error("Update failed:", error);
-  process.exit(1);
-});
+// Only run directly if this file is executed directly (not imported)
+if (import.meta.url === new URL(import.meta.url).href) {
+  console.log("Starting tender database update:", new Date().toISOString());
+  updateTenders().catch((error) => {
+    console.error("Update failed:", error);
+    process.exit(1);
+  });
+}
