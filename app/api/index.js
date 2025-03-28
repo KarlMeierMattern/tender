@@ -21,7 +21,10 @@ export async function getTenders() {
 
 export async function getTendersDetail() {
   try {
-    const tenders = await scrapeTendersDetail();
+    const tenders = await scrapeTendersDetail({
+      maxTenders: 5,
+      maxDetailsPerPage: 3,
+    });
     return NextResponse.json({ success: true, data: tenders });
   } catch (error) {
     return NextResponse.json(

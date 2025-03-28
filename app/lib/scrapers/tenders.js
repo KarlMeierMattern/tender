@@ -47,8 +47,7 @@ export async function scrapeTenders() {
       }
     }
 
-    // Limit the results to 50
-    return allTenders.slice(0, 50);
+    return allTenders;
   } catch (error) {
     console.log("Scraping error", error);
     throw error;

@@ -1,7 +1,13 @@
 import puppeteer from "puppeteer";
 import { ETENDERS_URL } from "@/app/lib/utils/constants";
 
-export async function scrapeTendersDetail() {
+export async function scrapeTendersDetail(options = {}) {
+  // Default values for limits
+  const {
+    maxTenders = Infinity, // Default to all tenders
+    maxDetailsPerPage = Infinity, // Default to all details
+  } = options;
+
   const browser = await puppeteer.launch({
     headless: true,
     slowMo: 100,
@@ -17,8 +23,8 @@ export async function scrapeTendersDetail() {
     const allTenders = [];
     let hasNextPage = true;
 
-    while (hasNextPage && allTenders.length < 10) {
-      // specifies the number of entries to scrape
+    // specifies the number of entries to scrape
+    while (hasNextPage && allTenders.length <= maxTenders) {
       // Wait for the table to load
       await page.waitForSelector("table.display.dataTable");
 
@@ -43,7 +49,7 @@ export async function scrapeTendersDetail() {
       let clickCount = 0;
       // iterates over each object in the tenders array
       for (const row of tenders) {
-        if (clickCount >= 5) break; // specifies the number of detailed entries to scrape
+        if (clickCount >= maxDetailsPerPage) break; // specifies the number of detailed entries to scrape
 
         const rows = await page.evaluate(() => {
           return Array.from(
@@ -165,7 +171,6 @@ export async function scrapeTendersDetail() {
       }
     }
 
-    // Limit the results to 50
     return allTenders;
   } catch (error) {
     console.log("Scraping error", error);
