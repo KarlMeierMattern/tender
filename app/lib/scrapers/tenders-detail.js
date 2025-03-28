@@ -7,14 +7,14 @@ export async function scrapeTendersDetail(options = {}) {
 
   const browser = await puppeteer.launch({
     headless: true,
-    slowMo: 250,
+    slowMo: 100,
   });
 
   try {
     const page = await browser.newPage();
     await page.goto(ETENDERS_URL, {
       waitUntil: "networkidle0",
-      timeout: 120000,
+      timeout: 600000,
     });
 
     const allTenders = [];
@@ -22,7 +22,7 @@ export async function scrapeTendersDetail(options = {}) {
 
     while (currentPage < maxPages) {
       await page.waitForSelector("table.display.dataTable", {
-        timeout: 60000,
+        timeout: 30000,
         visible: true,
       });
 
@@ -43,9 +43,13 @@ export async function scrapeTendersDetail(options = {}) {
         }));
       });
 
-      // Click each row and get details
+      // Process each row on the current page
       for (let index = 0; index < tenders.length; index++) {
         try {
+          console.log(
+            `Scraping tender ${index + 1}: ${tenders[index].description}`
+          );
+
           // Click to reveal details
           await page.evaluate((index) => {
             const buttonCell = document
@@ -55,7 +59,7 @@ export async function scrapeTendersDetail(options = {}) {
           }, index);
 
           // Wait for details to load
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
           // Get details
           const details = await page.evaluate((index) => {
@@ -120,15 +124,23 @@ export async function scrapeTendersDetail(options = {}) {
           });
 
           allTenders.push(tender);
+
+          // Click again to close details (prepare for next row)
+          await page.evaluate((index) => {
+            const buttonCell = document
+              .querySelectorAll("table.display.dataTable tbody tr")
+              [index].querySelector("td:nth-child(1)");
+            if (buttonCell) buttonCell.click();
+          }, index);
+
+          // Wait for details to close
+          await new Promise((resolve) => setTimeout(resolve, 500));
         } catch (error) {
           console.log(`Error processing tender at index ${index}:`, error);
-          // Still add the basic tender info even if details failed
+          // If error occurs, add basic tender info
           allTenders.push(tenders[index]);
         }
       }
-
-      // Add all tenders from the current page
-      allTenders.push(...tenders);
 
       // Move to next page if not on last page
       currentPage++;
