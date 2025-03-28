@@ -15,7 +15,7 @@ export async function scrapeTenders() {
     const allTenders = [];
     let hasNextPage = true;
 
-    while (hasNextPage && allTenders.length < 20) {
+    while (hasNextPage && allTenders.length < 10) {
       // Wait for the table to load
       await page.waitForSelector("table.display.dataTable");
 

@@ -19,11 +19,11 @@ export async function getTenders() {
   }
 }
 
+// set maxTenders in increments of 10
 export async function getTendersDetail() {
   try {
     const tenders = await scrapeTendersDetail({
-      maxTenders: 5,
-      maxDetailsPerPage: 3,
+      maxPages: 1,
     });
     return NextResponse.json({ success: true, data: tenders });
   } catch (error) {
