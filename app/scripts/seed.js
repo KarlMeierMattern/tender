@@ -27,8 +27,8 @@ async function main() {
     console.log("Cleared existing tenders");
 
     // Scrape tender data
-    const tenders = await scrapeTendersDetail({ maxPages: Infinity });
     console.log("Starting full data scrape...");
+    const tenders = await scrapeTendersDetail({ maxPages: Infinity });
 
     // Format the data to match your schema
     const formattedTenders = tenders.map((tender) => {

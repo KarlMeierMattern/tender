@@ -19,6 +19,7 @@ export async function scrapeTendersDetail(options = {}) {
 
     const allTenders = [];
     let currentPage = 0;
+    let totalCount = 0;
 
     while (currentPage < maxPages) {
       await page.waitForSelector("table.display.dataTable", {
@@ -46,8 +47,11 @@ export async function scrapeTendersDetail(options = {}) {
       // Process each row on the current page
       for (let index = 0; index < tenders.length; index++) {
         try {
+          totalCount++;
           console.log(
-            `Scraping tender ${index + 1}: ${tenders[index].description}`
+            `Scraping tender ${totalCount} (Page ${currentPage + 1}, Item ${
+              index + 1
+            }/10): ${tenders[index].description}`
           );
 
           // Click to reveal details
