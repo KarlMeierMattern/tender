@@ -32,14 +32,33 @@ async function main() {
 
     // Format the data to match your schema
     const formattedTenders = tenders.map((tender) => {
-      // Convert DD/MM/YYYY to mongo db recognised format of YYYY-MM-DD
+      // Validate the date format
+      const isValidDate = (dateString) => {
+        const regex = /^\d{2}\/\d{2}\/\d{4}$/; // DD/MM/YYYY format
+        return regex.test(dateString);
+      };
+
+      if (!isValidDate(tender.advertised)) {
+        console.error(
+          `Invalid date format for advertised: ${tender.advertised}`
+        );
+        return null; // Skip this tender or handle the error
+      }
+
       const [day, month, year] = tender.advertised.split("/");
-      const formattedDate = `${year}-${month}-${day}`;
+      const formattedDate = new Date(`${year}-${month}-${day}`); // Create a Date object
+
+      if (isNaN(formattedDate.getTime())) {
+        console.error(
+          `Invalid date value for advertised: ${tender.advertised}`
+        );
+        return null; // Skip this tender or handle the error
+      }
 
       return {
         category: tender.category,
         description: tender.description,
-        advertised: new Date(formattedDate), // Convert to Date object
+        advertised: formattedDate,
         closing: tender.closing,
         tendernumber: tender.tendernumber,
         department: tender.department,
