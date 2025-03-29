@@ -1,11 +1,27 @@
 import { NextResponse } from "next/server";
 import { StatusCodes } from "http-status-codes";
 import { scrapeTenders } from "@/app/lib/scrapers";
-import { scrapeTendersDetail } from "@/app/lib/scrapers";
 import { scrapeTendersTest } from "@/app/lib/scrapers";
 import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { z } from "zod";
+import { TenderModel } from "../model/tenderModel.js";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
+
+async function connectDB() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
+  }
+}
 
 export async function getTenders() {
   try {
@@ -21,9 +37,11 @@ export async function getTenders() {
 
 export async function getTendersDetail() {
   try {
-    const tenders = await scrapeTendersDetail({
-      maxPages: 1,
-    });
+    // const tenders = await scrapeTendersDetail({
+    //   maxPages: 1,
+    // });
+    await connectDB(); // Ensure the database is connected
+    const tenders = await TenderModel.find({});
     return NextResponse.json({ success: true, data: tenders });
   } catch (error) {
     return NextResponse.json(

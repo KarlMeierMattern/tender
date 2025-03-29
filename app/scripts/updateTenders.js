@@ -14,7 +14,7 @@ export async function updateTenders() {
     console.log("Connected to MongoDB");
 
     // 1. Get new data from scraping
-    const scrapedTenders = await scrapeTendersDetail({ maxPages: 1 });
+    const scrapedTenders = await scrapeTendersDetail({ maxPages: Infinity });
 
     // 2. Format the scraped tenders
     const formattedTenders = scrapedTenders.map((tender) => {
