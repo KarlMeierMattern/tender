@@ -30,7 +30,7 @@ export default function TendersPage() {
   }, []);
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>; // Display the error message
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div>

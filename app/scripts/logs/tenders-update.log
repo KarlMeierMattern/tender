@@ -32,3 +32,17 @@ Updated 10 existing tenders
 Database update completed successfully
 Database connection closed
 Finished tender update at 2025-03-28 23:14:38
+Starting tender update at 2025-03-30 16:04:46
+Starting tender database update: Sunday, 30 March 2025 at 16:04:46 SAST
+Connected to MongoDB
+Scraping tender 1 (Page 1, Item 1/10): Provision of Banking Services for a period of five (5) years.
+Scraping tender 2 (Page 1, Item 2/10): FOR THE SUPPLY AND DELIVERY OF ROLLER DOOR SLATS AT TRANSNET ENGINEERING,
+GERMISTON FOR A ONCE OFF PERIOD
+Scraping tender 3 (Page 1, Item 3/10): Crosby Cleaning Service
+Scraping tender 4 (Page 1, Item 4/10): PROVISION OF LEGAL SERVICES FOR A PERIOD OF THREE (3) YEARS
+Scraping tender 5 (Page 1, Item 5/10): THREE (3) YEARS SUPPLY AND DELIVERY OF INDUSTRIAL COMPUTERS
+Scraping tender 6 (Page 1, Item 6/10): PROVISION OF INTENSIFIED CYBERSECURITY SERVICES WITH CYBERSECURITY ROADMAP AND STRATEGY FOR 3 YEARS
+Scraping tender 7 (Page 1, Item 7/10): TERM TENDER FOR THE PROVISION OF TRAFFIC CALMING MEASURES, FOOTWAYS AND ROAD RESTRAINTS
+Scraping tender 8 (Page 1, Item 8/10): GENERAL VALUATION AND SUPPLEMENTARY VALUATIONS FOR MOSSEL BAY MUNICIPALITY
+Scraping tender 9 (Page 1, Item 9/10): Supply, installation and commissioning of a mobile signal amplification system at the Western Cape Department of Agriculture, Elsenburg Research Farm.
+Scraping tender 10 (Page 1, Item 10/10): Contractor Appointment for Design and Build of The Rehabilitation of Runways, Taxiways, Taxilanes and Aprons Project for a Period of 60 Months at Kimberley Airport

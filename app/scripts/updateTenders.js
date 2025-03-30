@@ -1,4 +1,5 @@
-// performs a single database update when manually executed
+// Performs a single database update when manually executed
+// This file also gets exported to be used by cron job
 // npm run db:update
 
 import mongoose from "mongoose";
